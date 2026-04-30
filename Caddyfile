@@ -1,20 +1,15 @@
-# ============================================================
-# Caddyfile — FrankenPHP + Railway (sin TLS, puerto dinámico)
-# ============================================================
-
 {
-	admin off
-	auto_https off
-	frankenphp
+    admin off
+    auto_https off
+    frankenphp
 }
 
-{$SERVER_NAME} {
-	root * /app
-	php_server
-	encode zstd gzip
-
-	log {
-		output stderr
-		level ERROR
-	}
+:{$PORT:80} {
+    root * /app
+    php_server
+    encode zstd gzip
+    log {
+        output stderr
+        level ERROR
+    }
 }
