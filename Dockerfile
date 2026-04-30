@@ -13,15 +13,16 @@ RUN install-php-extensions \
     opcache \
     mbstring
 
-# Copiar todo el proyecto al directorio raíz de FrankenPHP
+# Copiar el proyecto al directorio raíz de la app
 COPY . /app
 
-# Permisos correctos
+# ⚠️ Copiar el Caddyfile donde FrankenPHP lo espera
+COPY Caddyfile /etc/caddy/Caddyfile
+
+# Permisos
 RUN chown -R www-data:www-data /app
 
-# Puerto por defecto (Railway lo sobreescribe con $PORT)
+# Puerto por defecto (Railway sobreescribe con $PORT)
 EXPOSE 80
 
-# Variable de entorno por defecto
-ENV PORT=80 \
-    SERVER_NAME=":80"
+ENV PORT=80
