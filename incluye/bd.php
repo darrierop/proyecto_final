@@ -31,11 +31,12 @@ function cargarEnv()
 
 cargarEnv();
 
-$host = $_ENV['DB_HOST'] ?? 'localhost';
-$puerto = (int) ($_ENV['DB_PORT'] ?? 3306);
-$usuario = $_ENV['DB_USUARIO'] ?? 'root';
-$password = $_ENV['DB_PASSWORD'] ?? '';
-$nombre = $_ENV['DB_NOMBRE'] ?? 'sistemaacademico';
+// Soporta .env local Y variables nativas de Railway
+$host     = $_ENV['DB_HOST']     ?? getenv('DB_HOST')     ?? getenv('MYSQLHOST')     ?? 'localhost';
+$puerto   = (int)($_ENV['DB_PORT']     ?? getenv('DB_PORT')     ?? getenv('MYSQLPORT')     ?? 3306);
+$usuario  = $_ENV['DB_USUARIO']  ?? getenv('DB_USUARIO')  ?? getenv('MYSQLUSER')     ?? 'root';
+$password = $_ENV['DB_PASSWORD'] ?? getenv('DB_PASSWORD') ?? getenv('MYSQLPASSWORD') ?? '';
+$nombre   = $_ENV['DB_NOMBRE']   ?? getenv('DB_NOMBRE')   ?? getenv('MYSQLDATABASE') ?? 'sistemaacademico';
 
 $conn = new mysqli($host, $usuario, $password, $nombre, $puerto);
 
