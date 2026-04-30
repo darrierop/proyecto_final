@@ -13,16 +13,20 @@ RUN install-php-extensions \
     opcache \
     mbstring
 
-# Copiar el proyecto al directorio raíz de la app
+# Copiar el proyecto
 COPY . /app
 
-# ⚠️ Copiar el Caddyfile donde FrankenPHP lo espera
+# Copiar el Caddyfile donde FrankenPHP lo espera
 COPY Caddyfile /etc/caddy/Caddyfile
 
-# Permisos
+# Copiar y dar permisos al entrypoint
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Permisos del proyecto
 RUN chown -R www-data:www-data /app
 
-# Puerto por defecto (Railway sobreescribe con $PORT)
 EXPOSE 80
 
-ENV PORT=80
+# El entrypoint establece SERVER_NAME=$PORT antes de arrancar
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

@@ -1,5 +1,5 @@
 # ============================================================
-# Caddyfile — FrankenPHP + Railway (puerto dinámico)
+# Caddyfile — FrankenPHP + Railway (sin TLS, puerto dinámico)
 # ============================================================
 
 {
@@ -8,16 +8,11 @@
 	frankenphp
 }
 
-:{$PORT:80} {
+{$SERVER_NAME} {
 	root * /app
-
-	# Servir PHP con FrankenPHP
 	php_server
-
-	# Compresión
 	encode zstd gzip
 
-	# Logs de error
 	log {
 		output stderr
 		level ERROR
