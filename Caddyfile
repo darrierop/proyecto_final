@@ -1,23 +1,25 @@
+# ============================================================
+# Caddyfile — FrankenPHP + Railway (puerto dinámico)
+# ============================================================
+
 {
 	admin off
 	auto_https off
+	frankenphp
 }
 
 :{$PORT:80} {
 	root * /app
+
+	# Servir PHP con FrankenPHP
 	php_server
-	file_server
 
-	encode gzip
+	# Compresión
+	encode zstd gzip
 
-	@php {
-		path *.php
-	}
-	handle @php {
-		php_server
-	}
-
-	handle {
-		try_files {path} {path}/ /index.php?{query}
+	# Logs de error
+	log {
+		output stderr
+		level ERROR
 	}
 }
