@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>educamos — Iniciar Sesión</title>
+  <title>Sistema Académico — Iniciar Sesión</title>
   <meta name="description" content="Plataforma educativa institucional. Inicia sesión para acceder al sistema académico.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -69,10 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <path d="M21 28L25 32L33 23" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <p class="junta-label">JUNTA DE COMUNIDADES</p>
-      <h1 class="marca-educamos">
-        <span class="letra-e">e</span>ducamos
-      </h1>
+      <h1 class="marca-educamos">Sistema Académico</h1>
     </div>
 
     <!-- SECCIÓN CLAVE -->
@@ -173,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div><!-- /login-card -->
 
   <footer class="login-footer">
-    Servicio de Gestión Académica &mdash; <?= date('Y') ?>
+    Sistema de Gestión Académica
   </footer>
 
 </div><!-- /login-page -->
