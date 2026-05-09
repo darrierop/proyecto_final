@@ -41,7 +41,13 @@ $nombre   = $_ENV['DB_NOMBRE']   ?? getenv('DB_NOMBRE')   ?? getenv('MYSQLDATABA
 $conn = new mysqli($host, $usuario, $password, $nombre, $puerto);
 
 if ($conn->connect_error) {
-    $error = $conn->connect_error;
+    $esEntornoLocal = (
+        str_contains(strtolower($_SERVER['DOCUMENT_ROOT'] ?? ''), 'htdocs') ||
+        str_contains(strtolower($_SERVER['DOCUMENT_ROOT'] ?? ''), 'www') ||
+        ($_ENV['APP_ENV'] ?? getenv('APP_ENV') ?? 'production') === 'local'
+    );
+    $mensajePublico = 'No se pudo conectar con la base de datos. Contacte con el administrador del sistema.';
+    $mensajeTecnico = $conn->connect_error;
     ?>
     <!DOCTYPE html>
     <html lang="es">
@@ -121,15 +127,19 @@ if ($conn->connect_error) {
         <div class="caja">
             <div style="font-size:3rem;margin-bottom:16px">🔌</div>
             <h2>No se pudo conectar a la base de datos</h2>
-            <p>El sistema no pudo conectar con MySQL. Revisa el archivo <strong>.env</strong> en la raíz del proyecto.</p>
-            <div class="tecnico"><?= htmlspecialchars($error) ?></div>
-            <ul class="pasos">
-                <li>Abre el archivo <code>.env</code> en la raíz del proyecto</li>
-                <li>Comprueba <code>DB_USUARIO</code> y <code>DB_PASSWORD</code></li>
-                <li>En XAMPP el usuario es <code>root</code> con contraseña <strong>vacía</strong></li>
-                <li>Asegúrate de que MySQL está arrancado en el panel de XAMPP</li>
-                <li>Verifica que la base de datos <code>sistemaacademico</code> existe en phpMyAdmin</li>
-            </ul>
+            <?php if ($esEntornoLocal): ?>
+                <p>Revisa el archivo <strong>.env</strong> en la raíz del proyecto.</p>
+                <div class="tecnico"><?= htmlspecialchars($mensajeTecnico) ?></div>
+                <ul class="pasos">
+                    <li>Abre el archivo <code>.env</code> en la raíz del proyecto</li>
+                    <li>Comprueba <code>DB_USUARIO</code> y <code>DB_PASSWORD</code></li>
+                    <li>En XAMPP el usuario es <code>root</code> con contraseña <strong>vacía</strong></li>
+                    <li>Asegúrate de que MySQL está arrancado en el panel de XAMPP</li>
+                    <li>Verifica que la base de datos <code>sistemaacademico</code> existe en phpMyAdmin</li>
+                </ul>
+            <?php else: ?>
+                <p><?= htmlspecialchars($mensajePublico) ?></p>
+            <?php endif; ?>
         </div>
     </body>
 
@@ -137,5 +147,6 @@ if ($conn->connect_error) {
     <?php
     exit;
 }
+
 
 $conn->set_charset('utf8mb4');

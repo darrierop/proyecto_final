@@ -1,6 +1,19 @@
 <?php
+// ── PROTECCIÓN: solo accesible en entorno local ─────────────
+$esLocal = str_contains(strtolower($_SERVER['DOCUMENT_ROOT'] ?? ''), 'htdocs')
+        || str_contains(strtolower($_SERVER['DOCUMENT_ROOT'] ?? ''), 'www')
+        || ($_ENV['APP_ENV'] ?? getenv('APP_ENV') ?? 'production') === 'local';
+
+if (!$esLocal) {
+    http_response_code(403);
+    echo '403 Forbidden';
+    exit;
+}
+// ────────────────────────────────────────────────────────────
+
 // Script de diagnóstico temporal — borrar después de verificar
 echo "<h2>Diagnóstico de conexión a BD</h2><pre>";
+
 
 // 1. Leer .env
 $envPath = __DIR__ . '/.env';

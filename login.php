@@ -1,7 +1,8 @@
 <?php
-session_start();
-if (isset($_SESSION['usuario_id'])) {
-    header('Location: panel.php');
+require_once 'incluye/autenticacion.php';
+
+if (estaAutenticado()) {
+    header('Location: ' . getBase() . '/panel.php');
     exit;
 }
 
@@ -10,34 +11,38 @@ require_once 'incluye/bd.php';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $usuario  = trim($_POST['usuario'] ?? '');
-    $password = $_POST['password'] ?? '';
-
-    if ($usuario && $password) {
-        $stmt = $conn->prepare("
-            SELECT u.id, u.usuario, u.password, u.nombre_completo, u.rol_id, r.nombre AS rol_nombre
-            FROM usuarios u
-            JOIN roles r ON u.rol_id = r.id
-            WHERE u.usuario = ?
-        ");
-        $stmt->bind_param('s', $usuario);
-        $stmt->execute();
-        $res = $stmt->get_result();
-
-        if ($fila = $res->fetch_assoc()) {
-            if (password_verify($password, $fila['password'])) {
-                $_SESSION['usuario_id']      = $fila['id'];
-                $_SESSION['usuario']         = $fila['usuario'];
-                $_SESSION['nombre_completo'] = $fila['nombre_completo'];
-                $_SESSION['rol']             = $fila['rol_id'];
-                $_SESSION['rol_nombre']      = $fila['rol_nombre'];
-                header('Location: panel.php');
-                exit;
-            }
-        }
-        $error = 'Usuario o contraseña incorrectos.';
+    // Validación CSRF
+    $tokenEnviado = $_POST['csrf_token'] ?? '';
+    if (!validarCsrfToken($tokenEnviado)) {
+        $error = 'Petición no válida. Recarga la página e inténtalo de nuevo.';
     } else {
-        $error = 'Por favor completa todos los campos.';
+        $usuario  = trim($_POST['usuario'] ?? '');
+        $password = $_POST['password'] ?? '';
+
+        if ($usuario && $password) {
+            $stmt = $conn->prepare("
+                SELECT u.id, u.usuario, u.password, u.nombre_completo, u.rol_id, r.nombre AS rol_nombre
+                FROM usuarios u
+                JOIN roles r ON u.rol_id = r.id
+                WHERE u.usuario = ?
+            ");
+            $stmt->bind_param('s', $usuario);
+            $stmt->execute();
+            $res = $stmt->get_result();
+
+            if ($fila = $res->fetch_assoc()) {
+                if (password_verify($password, $fila['password'])) {
+                    iniciarSesionSegura($fila);
+                    header('Location: ' . getBase() . '/panel.php');
+                    exit;
+                }
+            }
+            // Delay anti-brute-force: 600ms en intento fallido
+            usleep(600000);
+            $error = 'Usuario o contraseña incorrectos.';
+        } else {
+            $error = 'Por favor completa todos los campos.';
+        }
     }
 }
 ?>
@@ -119,6 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <?php endif; ?>
 
       <form method="POST" action="login.php" id="form-login" novalidate>
+        <input type="hidden" name="csrf_token" value="<?= generarCsrfToken() ?>">
 
         <div class="campo-grupo">
           <label for="campo-usuario">Usuario</label>
@@ -155,15 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </button>
       </form>
 
-      <!-- Acceso rápido demo -->
-      <div class="demo-accesos">
-        <p class="demo-titulo">Acceso rápido (demo)</p>
-        <div class="demo-chips">
-          <button type="button" class="chip chip-admin"   onclick="rellenarLogin('admin','admin123')">Admin</button>
-          <button type="button" class="chip chip-prof"    onclick="rellenarLogin('profesor1','profesor123')">Profesor</button>
-          <button type="button" class="chip chip-alumno"  onclick="rellenarLogin('alumno1','alumno123')">Alumno</button>
-        </div>
-      </div>
+
 
     </div><!-- /seccion-formulario -->
 
@@ -204,12 +202,7 @@ btnOjo.addEventListener('click', () => {
   btnOjo.classList.toggle('activo', !visible);
 });
 
-/* Relleno rápido demo */
-function rellenarLogin(u, p) {
-  document.getElementById('campo-usuario').value = u;
-  document.getElementById('campo-password').value = p;
-  document.getElementById('campo-usuario').focus();
-}
+
 
 /* Animación de carga en el botón al enviar */
 document.getElementById('form-login').addEventListener('submit', function() {

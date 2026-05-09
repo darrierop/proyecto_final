@@ -1,10 +1,14 @@
-﻿<?php
+<?php
 // incluye/cabecera.php
 $base = rtrim(str_replace("\\", "/", substr(
   str_replace("\\", "/", realpath(__DIR__ . "/..")),
   strlen(str_replace("\\", "/", realpath($_SERVER["DOCUMENT_ROOT"])))
 )), "/");
+
+// Enviar cabeceras de seguridad HTTP en todas las páginas autenticadas
+enviarCabecerasSeguridad();
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
