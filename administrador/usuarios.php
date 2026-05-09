@@ -8,19 +8,27 @@ $err = '';
 
 // ── CREATE ──
 if ($_POST['action'] ?? '' === 'create') {
-  $u = trim($_POST['usuario']);
+  $u  = trim($_POST['usuario']);
   $pw = $_POST['password'];
   $em = trim($_POST['email']);
   $nm = trim($_POST['nombre_completo']);
   $ri = (int) $_POST['rol_id'];
 
-  $hash = password_hash($pw, PASSWORD_BCRYPT);
-  $stmt = $conn->prepare("INSERT INTO usuarios (usuario,password,email,nombre_completo,rol_id) VALUES (?,?,?,?,?)");
-  $stmt->bind_param('ssssi', $u, $hash, $em, $nm, $ri);
-  if ($stmt->execute())
-    $msg = 'Usuario creado correctamente.';
-  else
-    $err = 'Error: ' . $conn->error;
+  if (strlen($pw) < 8) {
+    $err = 'La contraseña debe tener al menos 8 caracteres.';
+  } elseif (!preg_match('/[A-Z]/', $pw)) {
+    $err = 'La contraseña debe incluir al menos una letra mayúscula.';
+  } elseif (!preg_match('/[0-9]/', $pw)) {
+    $err = 'La contraseña debe incluir al menos un número.';
+  } else {
+    $hash = password_hash($pw, PASSWORD_BCRYPT);
+    $stmt = $conn->prepare("INSERT INTO usuarios (usuario,password,email,nombre_completo,rol_id) VALUES (?,?,?,?,?)");
+    $stmt->bind_param('ssssi', $u, $hash, $em, $nm, $ri);
+    if ($stmt->execute())
+      $msg = 'Usuario creado correctamente.';
+    else
+      $err = 'Error: ' . $conn->error;
+  }
 }
 
 // ── DELETE ──
@@ -68,7 +76,9 @@ require_once '../incluye/cabecera.php';
       </div>
       <div class="form-group">
         <label>Contraseña</label>
-        <input type="password" name="password" required placeholder="Mínimo 6 caracteres">
+        <input type="password" name="password" required
+          placeholder="Mínimo 8 car., 1 mayúscula, 1 número"
+          id="pwd-nuevo-usuario" autocomplete="new-password">
       </div>
     </div>
     <div class="form-row">
@@ -137,4 +147,31 @@ require_once '../incluye/cabecera.php';
 </div>
 
 <?php require_once '../incluye/pie.php'; ?>
-<script>filtrarTabla('buscar-usuarios', 'tbl-usuarios');</script>
+<script>
+filtrarTabla('buscar-usuarios', 'tbl-usuarios');
+
+// Validación de contraseña al crear usuario
+(function () {
+  var form = document.querySelector('form[method="POST"]');
+  var pwd  = document.getElementById('pwd-nuevo-usuario');
+  if (!form || !pwd) return;
+  form.addEventListener('submit', function (e) {
+    var v = pwd.value;
+    if (v.length < 8) {
+      e.preventDefault();
+      alert('La contraseña debe tener al menos 8 caracteres.');
+      pwd.focus(); return;
+    }
+    if (!/[A-Z]/.test(v)) {
+      e.preventDefault();
+      alert('La contraseña debe incluir al menos una letra mayúscula.');
+      pwd.focus(); return;
+    }
+    if (!/[0-9]/.test(v)) {
+      e.preventDefault();
+      alert('La contraseña debe incluir al menos un número.');
+      pwd.focus(); return;
+    }
+  });
+})();
+</script>

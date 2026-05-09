@@ -79,13 +79,17 @@ if ($_POST['accion'] ?? '' === 'foto') {
 // ── Cambiar contraseña ──
 if ($_POST['accion'] ?? '' === 'password') {
   $actual = $_POST['password_actual'];
-  $nueva = $_POST['password_nueva'];
+  $nueva  = $_POST['password_nueva'];
   $repetir = $_POST['password_repetir'];
 
   if (!password_verify($actual, $usuario['password'])) {
     $err = 'La contraseña actual no es correcta.';
-  } elseif (strlen($nueva) < 6) {
-    $err = 'La nueva contraseña debe tener al menos 6 caracteres.';
+  } elseif (strlen($nueva) < 8) {
+    $err = 'La nueva contraseña debe tener al menos 8 caracteres.';
+  } elseif (!preg_match('/[A-Z]/', $nueva)) {
+    $err = 'La contraseña debe incluir al menos una letra mayúscula.';
+  } elseif (!preg_match('/[0-9]/', $nueva)) {
+    $err = 'La contraseña debe incluir al menos un número.';
   } elseif ($nueva !== $repetir) {
     $err = 'Las contraseñas nuevas no coinciden.';
   } else {
@@ -308,7 +312,9 @@ require_once 'incluye/cabecera.php';
           <hr class="divisor">
           <div class="grupo-formulario">
             <label>Nueva contraseña</label>
-            <input type="password" name="password_nueva" required placeholder="Mínimo 6 caracteres" id="nuevaPwd">
+            <input type="password" name="password_nueva" required
+              placeholder="Mín. 8 car., 1 mayúscula y 1 número"
+              id="nuevaPwd" autocomplete="new-password">
           </div>
           <div class="grupo-formulario">
             <label>Repetir nueva contraseña</label>
@@ -336,22 +342,23 @@ require_once 'incluye/cabecera.php';
         <ul style="list-style:none;display:flex;flex-direction:column;gap:10px">
           <li style="display:flex;gap:10px;align-items:flex-start">
             <span style="color:var(--verde);font-size:15px;margin-top:1px">✓</span>
-            <span style="font-size:.84rem;color:var(--texto-2)">Usa al menos 8 caracteres mezclando letras, números y
-              símbolos</span>
+            <span style="font-size:.84rem;color:var(--texto-2)">Mínimo <strong>8 caracteres</strong></span>
           </li>
           <li style="display:flex;gap:10px;align-items:flex-start">
             <span style="color:var(--verde);font-size:15px;margin-top:1px">✓</span>
-            <span style="font-size:.84rem;color:var(--texto-2)">No uses la misma contraseña en varios sitios</span>
+            <span style="font-size:.84rem;color:var(--texto-2)">Al menos <strong>una letra mayúscula</strong> (A–Z)</span>
           </li>
           <li style="display:flex;gap:10px;align-items:flex-start">
             <span style="color:var(--verde);font-size:15px;margin-top:1px">✓</span>
-            <span style="font-size:.84rem;color:var(--texto-2)">Evita información personal como tu nombre o fecha de
-              nacimiento</span>
+            <span style="font-size:.84rem;color:var(--texto-2)">Al menos <strong>un número</strong> (0–9)</span>
+          </li>
+          <li style="display:flex;gap:10px;align-items:flex-start">
+            <span style="color:var(--verde);font-size:15px;margin-top:1px">✓</span>
+            <span style="font-size:.84rem;color:var(--texto-2)">No uses información personal como tu nombre o fecha de nacimiento</span>
           </li>
           <li style="display:flex;gap:10px;align-items:flex-start">
             <span style="color:var(--naranja);font-size:15px;margin-top:1px">⚠</span>
-            <span style="font-size:.84rem;color:var(--texto-2)">Cierra siempre sesión al terminar en ordenadores
-              compartidos</span>
+            <span style="font-size:.84rem;color:var(--texto-2)">Cierra siempre sesión al terminar en ordenadores compartidos</span>
           </li>
         </ul>
       </div>
@@ -402,9 +409,15 @@ require_once 'incluye/cabecera.php';
   const fuerzaTexto = document.getElementById('fuerza-texto');
   const coincideMsg = document.getElementById('coincide-msg');
 
+  const formPwd = nuevaPwd ? nuevaPwd.closest('form') : null;
+
+  function validarRequisitos(pwd) {
+    return pwd.length >= 8 && /[A-Z]/.test(pwd) && /[0-9]/.test(pwd);
+  }
+
   function calcularFuerza(pwd) {
     let puntos = 0;
-    if (pwd.length >= 8) puntos++;
+    if (pwd.length >= 8)  puntos++;
     if (pwd.length >= 12) puntos++;
     if (/[A-Z]/.test(pwd)) puntos++;
     if (/[0-9]/.test(pwd)) puntos++;
@@ -412,9 +425,37 @@ require_once 'incluye/cabecera.php';
     return puntos;
   }
 
+  // Lista visual de requisitos
+  const reqList = document.createElement('div');
+  reqList.id = 'req-list';
+  reqList.style.cssText = 'font-size:.78rem;margin-bottom:10px;display:none;display:flex;flex-direction:column;gap:4px';
+  reqList.innerHTML = [
+    ['req-len',   '8 caracteres mínimo'],
+    ['req-upper', 'Una letra mayúscula'],
+    ['req-num',   'Un número'],
+  ].map(([id, txt]) =>
+    `<span id="${id}" style="color:var(--rojo,#dc2626)">✗ ${txt}</span>`
+  ).join('');
+
   if (nuevaPwd) {
+    nuevaPwd.parentElement.insertAdjacentElement('afterend', reqList);
+    reqList.style.display = 'flex';
+
     nuevaPwd.addEventListener('input', function () {
       const v = this.value;
+
+      // Requisitos visuales
+      const ok = (id, cond) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = (cond ? '✓ ' : '✗ ') + el.textContent.slice(2);
+        el.style.color = cond ? 'var(--verde,#16a34a)' : 'var(--rojo,#dc2626)';
+      };
+      ok('req-len',   v.length >= 8);
+      ok('req-upper', /[A-Z]/.test(v));
+      ok('req-num',   /[0-9]/.test(v));
+
+      // Barra de fuerza
       if (!v) { fuerzaWrap.style.display = 'none'; return; }
       fuerzaWrap.style.display = 'block';
       const f = calcularFuerza(v);
@@ -429,6 +470,17 @@ require_once 'incluye/cabecera.php';
       fuerzaBarra.style.background = config.bg;
       fuerzaTexto.textContent = config.txt;
       fuerzaTexto.style.color = config.bg;
+    });
+  }
+
+  // Bloquear envío si no cumple requisitos
+  if (formPwd) {
+    formPwd.addEventListener('submit', function (e) {
+      if (nuevaPwd && !validarRequisitos(nuevaPwd.value)) {
+        e.preventDefault();
+        alert('La contraseña no cumple los requisitos: mínimo 8 caracteres, una mayúscula y un número.');
+        nuevaPwd.focus();
+      }
     });
   }
 
