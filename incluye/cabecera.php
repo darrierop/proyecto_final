@@ -34,27 +34,27 @@ if (isset($conn)) {
 }
 $paginaActual = basename($_SERVER["PHP_SELF"]);
 $navLinks = [];
-$navLinks[] = ["url" => "$base/panel.php",    "ico" => "⊞", "txt" => "Panel",    "p" => "panel.php"];
-$navLinks[] = ["url" => "$base/mensajes.php",  "ico" => "◻", "txt" => "Mensajes", "p" => "mensajes.php", "badge" => $sinLeer];
+$navLinks[] = ["url" => "$base/panel.php",    "ico" => "🏠", "txt" => "Panel",    "p" => "panel.php"];
+$navLinks[] = ["url" => "$base/mensajes.php",  "ico" => "✉️", "txt" => "Mensajes", "p" => "mensajes.php", "badge" => $sinLeer];
 if ($rol == 1) {
   $navLinks[] = ["sep" => true];
-  $navLinks[] = ["url" => "$base/administrador/usuarios.php",    "ico" => "◈", "txt" => "Usuarios",    "p" => "usuarios.php"];
-  $navLinks[] = ["url" => "$base/administrador/asignaturas.php", "ico" => "≡", "txt" => "Asignaturas", "p" => "asignaturas.php"];
-  $navLinks[] = ["url" => "$base/administrador/cursos.php",      "ico" => "⬡", "txt" => "Cursos",      "p" => "cursos.php"];
-  $navLinks[] = ["url" => "$base/administrador/aulas.php",       "ico" => "⬢", "txt" => "Aulas",       "p" => "aulas.php"];
-  $navLinks[] = ["url" => "$base/administrador/matriculas.php",  "ico" => "◉", "txt" => "Matriculas",  "p" => "matriculas.php"];
-  $navLinks[] = ["url" => "$base/administrador/avisos.php",      "ico" => "◎", "txt" => "Avisos",      "p" => "avisos.php"];
-  $navLinks[] = ["url" => "$base/administrador/auditoria.php",   "ico" => "⊙", "txt" => "Auditoria",   "p" => "auditoria.php"];
+  $navLinks[] = ["url" => "$base/administrador/usuarios.php",    "ico" => "👥", "txt" => "Usuarios",    "p" => "usuarios.php"];
+  $navLinks[] = ["url" => "$base/administrador/asignaturas.php", "ico" => "📚", "txt" => "Asignaturas", "p" => "asignaturas.php"];
+  $navLinks[] = ["url" => "$base/administrador/cursos.php",      "ico" => "🏫", "txt" => "Cursos",      "p" => "cursos.php"];
+  $navLinks[] = ["url" => "$base/administrador/aulas.php",       "ico" => "🚪", "txt" => "Aulas",       "p" => "aulas.php"];
+  $navLinks[] = ["url" => "$base/administrador/matriculas.php",  "ico" => "📋", "txt" => "Matriculas",  "p" => "matriculas.php"];
+  $navLinks[] = ["url" => "$base/administrador/avisos.php",      "ico" => "📢", "txt" => "Avisos",      "p" => "avisos.php"];
+  $navLinks[] = ["url" => "$base/administrador/auditoria.php",   "ico" => "🔍", "txt" => "Auditoria",   "p" => "auditoria.php"];
 } elseif ($rol == 2) {
   $navLinks[] = ["sep" => true];
-  $navLinks[] = ["url" => "$base/profesor/mis_cursos.php",      "ico" => "⬡", "txt" => "Mis Cursos",      "p" => "mis_cursos.php"];
-  $navLinks[] = ["url" => "$base/profesor/calificaciones.php",  "ico" => "◈", "txt" => "Calificaciones", "p" => "calificaciones.php"];
-  $navLinks[] = ["url" => "$base/profesor/horarios.php",        "ico" => "◎", "txt" => "Horarios",       "p" => "horarios.php"];
+  $navLinks[] = ["url" => "$base/profesor/mis_cursos.php",      "ico" => "🏫", "txt" => "Mis Cursos",      "p" => "mis_cursos.php"];
+  $navLinks[] = ["url" => "$base/profesor/calificaciones.php",  "ico" => "📝", "txt" => "Calificaciones", "p" => "calificaciones.php"];
+  $navLinks[] = ["url" => "$base/profesor/horarios.php",        "ico" => "📅", "txt" => "Horarios",       "p" => "horarios.php"];
 } else {
   $navLinks[] = ["sep" => true];
-  $navLinks[] = ["url" => "$base/alumno/mis_cursos.php",      "ico" => "≡", "txt" => "Mis Cursos", "p" => "mis_cursos.php"];
-  $navLinks[] = ["url" => "$base/alumno/calificaciones.php",  "ico" => "◉", "txt" => "Mis Notas",  "p" => "calificaciones.php"];
-  $navLinks[] = ["url" => "$base/alumno/horario.php",         "ico" => "◎", "txt" => "Horario",    "p" => "horario.php"];
+  $navLinks[] = ["url" => "$base/alumno/mis_cursos.php",      "ico" => "📚", "txt" => "Mis Cursos", "p" => "mis_cursos.php"];
+  $navLinks[] = ["url" => "$base/alumno/calificaciones.php",  "ico" => "📊", "txt" => "Mis Notas",  "p" => "calificaciones.php"];
+  $navLinks[] = ["url" => "$base/alumno/horario.php",         "ico" => "📅", "txt" => "Horario",    "p" => "horario.php"];
 }
 ?>
 
@@ -64,7 +64,7 @@ if ($rol == 1) {
 <!-- MODAL borrado -->
 <div id="modal-confirmar" style="display:none;position:fixed;inset:0;z-index:8000;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);">
   <div style="background:var(--card-bg,#fff);border:1px solid var(--borde,#e2e8f0);border-radius:16px;padding:32px 36px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;animation:modalEntrada .2s ease;">
-    <div style="font-size:2.5rem;margin-bottom:12px">⊘</div>
+    <div style="font-size:2.5rem;margin-bottom:12px">🗑️</div>
     <h3 style="font-size:1.1rem;color:var(--texto,#0f172a);margin-bottom:8px">¿Eliminar este registro?</h3>
     <p id="modal-msg" style="color:var(--texto3,#94a3b8);font-size:.85rem;margin-bottom:24px"></p>
     <div style="display:flex;gap:10px;justify-content:center">
@@ -88,15 +88,15 @@ if ($rol == 1) {
 <?php endif; ?>
 <?php endforeach; ?>
     <hr style="border:none;border-top:1px solid #e2e8f0;margin:4px 0">
-    <a href="<?= $base ?>/perfil.php" class="nav-pill <?= $paginaActual=="perfil.php"?"activo":"" ?>">◈ Mi Perfil</a>
-    <a href="<?= $base ?>/cerrar_sesion.php" class="nav-pill" style="color:#dc2626">⊗ Cerrar Sesión</a>
+    <a href="<?= $base ?>/perfil.php" class="nav-pill <?= $paginaActual=="perfil.php"?"activo":"" ?>">👤 Mi Perfil</a>
+    <a href="<?= $base ?>/cerrar_sesion.php" class="nav-pill" style="color:#dc2626">🚪 Cerrar Sesión</a>
   </div>
 </div>
 
 <!-- TOPBAR -->
 <header class="topbar" id="topbar">
   <a href="<?= $base ?>/panel.php" class="topbar-logo">
-    <div class="logo-icono">◈</div>
+    <div class="logo-icono">🎓</div>
     <div class="logo-nombre">AcademiSys<span>Gestión Académica</span></div>
   </a>
 
@@ -115,7 +115,7 @@ if ($rol == 1) {
 
   <div class="topbar-acciones">
     <button id="btn-tema" title="Cambiar tema" aria-label="Modo claro/oscuro">
-      <span class="icono-sol">○</span><span class="icono-luna">●</span>
+      <span class="icono-sol">☀️</span><span class="icono-luna">🌙</span>
     </button>
     <div class="user-pill-wrap">
       <div class="user-pill" id="user-pill" onclick="toggleUserMenu()">
@@ -128,9 +128,9 @@ if ($rol == 1) {
           <div style="font-size:.82rem;font-weight:600;color:#0f172a"><?= htmlspecialchars($nombre) ?></div>
           <div style="margin-top:3px"><span class="etiqueta-rol <?= $claseRol ?>"><?= htmlspecialchars($rolNombre) ?></span></div>
         </div>
-        <a href="<?= $base ?>/perfil.php">◈ Mi Perfil</a>
+        <a href="<?= $base ?>/perfil.php">👤 Mi Perfil</a>
         <hr class="user-menu-divider">
-        <a href="<?= $base ?>/cerrar_sesion.php" class="menu-peligro">⊗ Cerrar Sesión</a>
+        <a href="<?= $base ?>/cerrar_sesion.php" class="menu-peligro">🚪 Cerrar Sesión</a>
       </div>
     </div>
     <button id="btn-menu" aria-label="Abrir menú" onclick="toggleNav()">

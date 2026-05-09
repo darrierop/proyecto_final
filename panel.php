@@ -86,12 +86,12 @@ function colorNota($n)
 // ── Avisos ──
 if ($avisos && $avisos->num_rows > 0):
   $tipoEstilo = ['Info' => 'alerta-info', 'Alerta' => 'alerta-aviso', 'Urgente' => 'alerta-error', 'Exito' => 'alerta-exito'];
-  $tipoIco = ['Info' => '⬡', 'Alerta' => '◎', 'Urgente' => '⊗', 'Exito' => '⊙'];
+  $tipoIco = ['Info' => 'ℹ️', 'Alerta' => '⚠️', 'Urgente' => '🚨', 'Exito' => '✅'];
   ?>
   <div style="margin-bottom:18px;display:flex;flex-direction:column;gap:8px">
     <?php while ($av = $avisos->fetch_assoc()):
       $cls = $tipoEstilo[$av['tipo']] ?? 'alerta-info';
-      $ico = $tipoIco[$av['tipo']] ?? '◉';
+      $ico = $tipoIco[$av['tipo']] ?? '📌';
       ?>
       <div class="alerta <?= $cls ?>"><?= $ico ?> <strong><?= htmlspecialchars($av['titulo']) ?></strong> —
         <?= htmlspecialchars($av['cuerpo']) ?>
@@ -106,28 +106,28 @@ if ($avisos && $avisos->num_rows > 0):
     <div class="tarjeta-estadistica">
       <div class="estadistica-etiqueta">Usuarios totales</div>
       <div class="estadistica-valor" style="color:var(--accent)"><?= $estadisticas['usuarios'] ?></div>
-      <div class="estadistica-icono">◈</div>
+      <div class="estadistica-icono">👥</div>
     </div>
     <div class="tarjeta-estadistica">
       <div class="estadistica-etiqueta">Cursos activos</div>
       <div class="estadistica-valor" style="color:var(--accent2)"><?= $estadisticas['cursos'] ?></div>
-      <div class="estadistica-icono">⬡</div>
+      <div class="estadistica-icono">🏫</div>
     </div>
     <div class="tarjeta-estadistica">
       <div class="estadistica-etiqueta">Matrículas</div>
       <div class="estadistica-valor" style="color:var(--success)"><?= $estadisticas['matriculas'] ?></div>
-      <div class="estadistica-icono">◉</div>
+      <div class="estadistica-icono">📋</div>
     </div>
     <div class="tarjeta-estadistica">
       <div class="estadistica-etiqueta">Asignaturas</div>
       <div class="estadistica-valor" style="color:var(--gold)"><?= $estadisticas['asignaturas'] ?></div>
-      <div class="estadistica-icono">≡</div>
+      <div class="estadistica-icono">📚</div>
     </div>
   </div>
 
   <div class="rejilla-2col">
     <div class="tarjeta">
-      <div class="tarjeta-titulo">◈ Usuarios recientes</div>
+      <div class="tarjeta-titulo">👥 Usuarios recientes</div>
       <div class="tabla-contenedor">
         <table>
           <thead>
@@ -155,7 +155,7 @@ if ($avisos && $avisos->num_rows > 0):
     </div>
 
     <div class="tarjeta">
-      <div class="tarjeta-titulo">◉ Últimas matrículas</div>
+      <div class="tarjeta-titulo">📋 Últimas matrículas</div>
       <div class="tabla-contenedor">
         <table>
           <thead>
@@ -184,11 +184,11 @@ if ($avisos && $avisos->num_rows > 0):
   <!-- ── GRÁFICAS ADMINISTRADOR ── -->
   <div class="rejilla-2col" style="margin-top:20px">
     <div class="tarjeta">
-      <div class="tarjeta-titulo">◉ Distribución de notas</div>
+      <div class="tarjeta-titulo">📊 Distribución de notas</div>
       <div class="grafica-contenedor"><canvas id="chartNotas"></canvas></div>
     </div>
     <div class="tarjeta">
-      <div class="tarjeta-titulo">⬡ Aprobados vs Suspensos</div>
+      <div class="tarjeta-titulo">🎓 Aprobados vs Suspensos</div>
       <div class="grafica-contenedor"><canvas id="chartAprobados"></canvas></div>
     </div>
   </div>
@@ -258,26 +258,26 @@ if ($avisos && $avisos->num_rows > 0):
     <div class="tarjeta-estadistica">
       <div class="estadistica-etiqueta">Mis cursos</div>
       <div class="estadistica-valor" style="color:var(--accent)"><?= $totalCursos ?></div>
-      <div class="estadistica-icono">⬡</div>
+      <div class="estadistica-icono">🏫</div>
     </div>
     <div class="tarjeta-estadistica">
       <div class="estadistica-etiqueta">Alumnos totales</div>
       <div class="estadistica-valor" style="color:var(--success)"><?= $totalAlumnos ?></div>
-      <div class="estadistica-icono">◈</div>
+      <div class="estadistica-icono">👩‍🎓</div>
     </div>
     <div class="tarjeta-estadistica">
       <div class="estadistica-etiqueta">Notas pendientes</div>
       <div class="estadistica-valor" style="color:<?= $notasPendientes > 0 ? 'var(--warning)' : 'var(--success)' ?>">
         <?= $notasPendientes ?>
       </div>
-      <div class="estadistica-icono">◎</div>
+      <div class="estadistica-icono">📝</div>
     </div>
   </div>
 
   <div class="tarjeta">
     <div class="tarjeta-titulo" style="justify-content:space-between">
-      ⬡ Mis Cursos
-      <a href="<?= $base ?>/profesor/calificaciones.php" class="btn btn-primario btn-sm">◈ Gestionar Notas</a>
+      🏫 Mis Cursos
+      <a href="<?= $base ?>/profesor/calificaciones.php" class="btn btn-primario btn-sm">📝 Gestionar Notas</a>
     </div>
     <div class="tabla-contenedor">
       <table>
@@ -322,7 +322,7 @@ if ($avisos && $avisos->num_rows > 0):
   }
   ?>
   <div class="tarjeta" style="margin-top:20px">
-    <div class="tarjeta-titulo">◉ Alumnos por asignatura</div>
+    <div class="tarjeta-titulo">📊 Alumnos por asignatura</div>
     <div class="grafica-contenedor"><canvas id="chartProf"></canvas></div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -340,24 +340,24 @@ if ($avisos && $avisos->num_rows > 0):
     <div class="tarjeta-estadistica">
       <div class="estadistica-etiqueta">Asignaturas</div>
       <div class="estadistica-valor" style="color:var(--accent)"><?= $totalMats ?></div>
-      <div class="estadistica-icono">≡</div>
+      <div class="estadistica-icono">📚</div>
     </div>
     <div class="tarjeta-estadistica">
       <div class="estadistica-etiqueta">Media general</div>
       <div class="estadistica-valor" style="color:<?= $promedio >= 5 ? 'var(--success)' : 'var(--danger)' ?>">
         <?= $promedio ? number_format($promedio, 1) : '—' ?>
       </div>
-      <div class="estadistica-icono">◉</div>
+      <div class="estadistica-icono">📊</div>
     </div>
     <div class="tarjeta-estadistica">
       <div class="estadistica-etiqueta">Aprobadas</div>
       <div class="estadistica-valor" style="color:var(--success)"><?= $aprobadas ?></div>
-      <div class="estadistica-icono">⊙</div>
+      <div class="estadistica-icono">✅</div>
     </div>
   </div>
 
   <div class="tarjeta">
-    <div class="tarjeta-titulo">≡ Mis Asignaturas</div>
+    <div class="tarjeta-titulo">📚 Mis Asignaturas</div>
     <div class="tabla-contenedor">
       <table>
         <thead>
@@ -400,10 +400,10 @@ if ($avisos && $avisos->num_rows > 0):
   <?php if (count($labelsAlumno)): ?>
     <div class="tarjeta" style="margin-top:20px">
       <div class="tarjeta-titulo">
-        ◉ Mis notas
+        📊 Mis notas
         <div style="display:flex;gap:8px">
-          <a href="<?= $base ?>/exportar_pdf.php" target="_blank" class="btn btn-borde btn-sm">◎ PDF</a>
-          <a href="<?= $base ?>/exportar_excel.php?tipo=expediente" class="btn btn-borde btn-sm">≡ Excel</a>
+          <a href="<?= $base ?>/exportar_pdf.php" target="_blank" class="btn btn-borde btn-sm">🖨️ PDF</a>
+          <a href="<?= $base ?>/exportar_excel.php?tipo=expediente" class="btn btn-borde btn-sm">📥 Excel</a>
         </div>
       </div>
       <div class="grafica-contenedor"><canvas id="chartAlumno"></canvas></div>
