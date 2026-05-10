@@ -44,8 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($fila = $res->fetch_assoc()) {
                     if (password_verify($password, $fila['password'])) {
                         limpiarIntentos($usuario, $conn);
-                        registrarLogin($conn, $usuario, true);
-                        iniciarSesionSegura($fila);
+                        iniciarSesionSegura($fila);      // primero: pone usuario_id en sesión
+                        registrarLogin($conn, $usuario, true); // después: ya tiene la sesión
                         header('Location: ' . getBase() . '/panel.php');
                         exit;
                     }

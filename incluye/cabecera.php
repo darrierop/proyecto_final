@@ -18,7 +18,7 @@ enviarCabecerasSeguridad();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($tituloPagina ?? "Sistema Academico") ?> — AcademiSys</title>
-  <link rel="stylesheet" href="<?= $base ?>/estilos/global.css?v=20260504">
+  <link rel="stylesheet" href="<?= $base ?>/estilos/global.css?v=20260510">
   <script>(function(){var t=localStorage.getItem("tema");if(t==="oscuro")document.documentElement.setAttribute("data-tema","oscuro");})();</script>
 </head>
 <body>
