@@ -28,7 +28,7 @@ function registrarAuditoria(
  */
 function registrarLogin(mysqli $conn, string $usuario, bool $exitoso): void
 {
-    $accion  = $exitoso ? 'LOGIN_OK' : 'LOGIN_FALLIDO';
+    $accion  = $exitoso ? 'LOGIN' : 'LOGIN_ERR';
     $detalle = 'Usuario: ' . $usuario;
     registrarAuditoria($conn, $accion, 'usuarios', null, $detalle);
 }
