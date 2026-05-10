@@ -8,7 +8,7 @@ $msg = '';
 $err = '';
 
 // ── CREATE ──
-if ($_POST['action'] ?? '' === 'create') {
+if (($_POST['action'] ?? '') === 'create') {
   if (!validarCsrfToken($_POST['csrf_token'] ?? '')) {
     $err = 'Petición no válida. Recarga la página.';
   } else {

@@ -8,7 +8,7 @@ $msg = ''; $err = '';
 $cursoId = isset($_GET['curso_id']) ? (int)$_GET['curso_id'] : 0;
 
 // ── UPDATE nota_final ──
-if ($_POST['action'] ?? '' === 'nota') {
+if (($_POST['action'] ?? '') === 'nota') {
     if (!validarCsrfToken($_POST['csrf_token'] ?? '')) {
         $err = 'Petición no válida.';
     } else {
@@ -30,7 +30,7 @@ if ($_POST['action'] ?? '' === 'nota') {
 }
 
 // ── ADD actividad ──
-if ($_POST['action'] ?? '' === 'add_cal') {
+if (($_POST['action'] ?? '') === 'add_cal') {
     if (!validarCsrfToken($_POST['csrf_token'] ?? '')) {
         $err = 'Petición no válida.';
     } else {

@@ -9,7 +9,7 @@ $err = '';
 $view = $_GET['view'] ?? 'inbox';
 
 // ── ENVIAR ──
-if ($_POST['action'] ?? '' === 'send') {
+if (($_POST['action'] ?? '') === 'send') {
   if (!validarCsrfToken($_POST['csrf_token'] ?? '')) {
     $err = 'Petición no válida. Recarga la página.';
   } else {
