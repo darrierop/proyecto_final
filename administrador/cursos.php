@@ -6,7 +6,10 @@ require_once '../incluye/bd.php';
 $msg = '';
 $err = '';
 
-if ($_POST['action'] ?? '' === 'create') {
+if (($_POST['action'] ?? '') === 'create') {
+  if (!validarCsrfToken($_POST['csrf_token'] ?? '')) {
+    $err = 'Petición no válida. Recarga la página.';
+  } else {
   $asi = (int) $_POST['asignatura_id'];
   $pro = (int) $_POST['profesor_id'];
   $gr = trim($_POST['nombre_grupo']);
@@ -18,6 +21,7 @@ if ($_POST['action'] ?? '' === 'create') {
     $msg = 'Curso creado.';
   else
     $err = $conn->error;
+  } // cierre CSRF
 }
 if (isset($_GET['del'])) {
   $conn->query("DELETE FROM cursos WHERE id=" . (int) $_GET['del']);
@@ -50,6 +54,7 @@ require_once '../incluye/cabecera.php';
   <div class="tarjeta-titulo">➕ Nuevo Curso</div>
   <form method="POST">
     <input type="hidden" name="action" value="create">
+    <input type="hidden" name="csrf_token" value="<?= generarCsrfToken() ?>">
     <div class="form-row">
       <div class="form-group">
         <label>Asignatura</label>

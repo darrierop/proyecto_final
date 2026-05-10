@@ -5,20 +5,33 @@ require_once '../incluye/bd.php';
 
 $msg = ''; $err = '';
 
-if ($_POST['action'] ?? '' === 'create') {
-    $al = (int)$_POST['alumno_id'];
-    $cu = (int)$_POST['curso_id'];
-    $stmt = $conn->prepare("INSERT INTO matriculas (alumno_id, curso_id) VALUES (?,?)");
-    $stmt->bind_param('ii', $al, $cu);
-    if ($stmt->execute()) $msg = 'Matrícula registrada.';
-    else $err = 'Error (¿ya matriculado?): ' . $conn->error;
+// Paréntesis correctos para evitar el bug de precedencia de ?? vs ===
+if (($_POST['action'] ?? '') === 'create') {
+    if (!validarCsrfToken($_POST['csrf_token'] ?? '')) {
+        $err = 'Petición no válida. Recarga la página.';
+    } else {
+        $al = (int)$_POST['alumno_id'];
+        $cu = (int)$_POST['curso_id'];
+        $stmt = $conn->prepare("INSERT INTO matriculas (alumno_id, curso_id) VALUES (?,?)");
+        $stmt->bind_param('ii', $al, $cu);
+        if ($stmt->execute()) $msg = 'Matrícula registrada.';
+        else $err = 'Error (¿ya matriculado?): ' . $conn->error;
+    }
 }
-if ($_POST['action'] ?? '' === 'nota') {
-    $id = (int)$_POST['mat_id'];
-    $nota = $_POST['nota_final'] === '' ? 'NULL' : (float)$_POST['nota_final'];
-    $conn->query("UPDATE matriculas SET nota_final = $nota WHERE id = $id");
-    $msg = 'Nota actualizada.';
+
+if (($_POST['action'] ?? '') === 'nota') {
+    if (!validarCsrfToken($_POST['csrf_token'] ?? '')) {
+        $err = 'Petición no válida. Recarga la página.';
+    } else {
+        $id   = (int)$_POST['mat_id'];
+        $nota = $_POST['nota_final'] === '' ? null : (float)$_POST['nota_final'];
+        $stmt = $conn->prepare("UPDATE matriculas SET nota_final = ? WHERE id = ?");
+        $stmt->bind_param('di', $nota, $id);
+        if ($stmt->execute()) $msg = 'Nota actualizada.';
+        else $err = 'Error: ' . $conn->error;
+    }
 }
+
 if (isset($_GET['del'])) {
     $conn->query("DELETE FROM matriculas WHERE id=" . (int)$_GET['del']);
     $msg = 'Matrícula eliminada.';
@@ -58,6 +71,7 @@ function notaClass($n) {
   <div class="tarjeta-titulo">➕ Nueva Matrícula</div>
   <form method="POST">
     <input type="hidden" name="action" value="create">
+    <input type="hidden" name="csrf_token" value="<?= generarCsrfToken() ?>">
     <div class="form-row">
       <div class="form-group">
         <label>Alumno</label>
@@ -98,6 +112,7 @@ function notaClass($n) {
             <!-- Quick-nota form -->
             <form method="POST" style="display:flex;gap:4px">
               <input type="hidden" name="action" value="nota">
+              <input type="hidden" name="csrf_token" value="<?= generarCsrfToken() ?>">
               <input type="hidden" name="mat_id" value="<?= $m['id'] ?>">
               <input type="number" name="nota_final" min="0" max="10" step="0.1"
                      value="<?= $m['nota_final'] ?? '' ?>"
