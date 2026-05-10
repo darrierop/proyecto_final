@@ -1,7 +1,5 @@
-# ============================================================
 # Dockerfile — Sistema Académico (FrankenPHP + Railway)
 # Puerto dinámico via $PORT
-# ============================================================
 
 FROM dunglas/frankenphp:latest
 
