@@ -1,9 +1,8 @@
 <?php
-session_start();
-if (isset($_SESSION['usuario_id'])) {
-    header('Location: panel.php');
+require_once 'incluye/autenticacion.php'; // inicia sesión con params seguros
+if (estaAutenticado()) {
+    header('Location: ' . getBase() . '/panel.php');
 } else {
-    header('Location: login.php');
+    header('Location: ' . getBase() . '/login.php');
 }
 exit;
-?>
