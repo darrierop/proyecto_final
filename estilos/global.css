@@ -118,6 +118,8 @@ tbody tr:hover td{background:#fafafa}
   .user-nombre,.user-chevron{display:none !important}
   .user-pill{padding:4px}
   .topbar{padding:0 12px;gap:8px}
+  /* Menú usuario: alineado a la izquierda del avatar, no a la derecha (evita que se salga de pantalla) */
+  .user-menu{right:auto;left:0;min-width:200px;max-width:calc(100vw - 24px)}
 }
 @media(max-width:768px){body{padding-top:calc(var(--topbar-h) + var(--ctx-h))}.contenido-pagina{padding:12px}.rejilla-estadisticas{grid-template-columns:1fr 1fr;gap:10px}.estadistica-valor{font-size:1.5rem}.fila-formulario,.fila-formulario-3,.form-row{grid-template-columns:1fr!important}.tarjeta{padding:14px}.tabla-contenedor{margin:0 -14px;padding:0 14px;overflow-x:auto}table{min-width:420px;font-size:.78rem}thead th,tbody td{padding:7px 10px}.rejilla-2col{grid-template-columns:1fr!important}.mensajes-layout{grid-template-columns:1fr!important}.mensajes-sidebar{position:static!important}.perfil-grid-2col{grid-template-columns:1fr!important}.horario-dias-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:480px){
