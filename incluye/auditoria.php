@@ -12,7 +12,8 @@ function registrarAuditoria(
     ?int $registroId,
     string $detalle = ''
 ): void {
-    $userId = (int)($_SESSION['usuario_id'] ?? 0);
+    // NULL cuando no hay sesión (ej: intento de login antes de autenticar)
+    $userId = isset($_SESSION['usuario_id']) ? (int)$_SESSION['usuario_id'] : null;
     $ip     = $_SERVER['REMOTE_ADDR'] ?? '';
 
     $stmt = $conn->prepare("
