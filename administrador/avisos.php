@@ -8,21 +8,24 @@ $msg = $err = '';
 
 // CREAR
 if ($_POST['accion'] ?? '' === 'crear') {
+    if (!validarCsrfToken($_POST['csrf_token'] ?? '')) {
+        $err = 'Petición no válida. Recarga la página.';
+    } else {
     $titulo = trim($_POST['titulo'] ?? '');
     $cuerpo = trim($_POST['cuerpo'] ?? '');
     $tipo = $_POST['tipo'] ?? 'Info';
     $expira = $_POST['expira'] ?? null;
     if ($titulo && $cuerpo) {
-        $t = $conn->real_escape_string($titulo);
-        $c = $conn->real_escape_string($cuerpo);
-        $ti = $conn->real_escape_string($tipo);
-        $e = $expira ? "'" . $conn->real_escape_string($expira) . "'" : 'NULL';
-        $uid = $_SESSION['usuario_id'];
-        $conn->query("INSERT INTO avisos (titulo, cuerpo, tipo, expira, creado_por) VALUES ('$t','$c','$ti',$e,$uid)");
+        $uid = (int)$_SESSION['usuario_id'];
+        $stmt = $conn->prepare("INSERT INTO avisos (titulo, cuerpo, tipo, expira, creado_por) VALUES (?,?,?,?,?)");
+        $expirado = $expira ?: null;
+        $stmt->bind_param('ssssi', $titulo, $cuerpo, $tipo, $expirado, $uid);
+        $stmt->execute();
         $msg = 'Aviso publicado correctamente.';
     } else {
         $err = 'Título y cuerpo son obligatorios.';
     }
+    } // cierre CSRF
 }
 
 // BORRAR
@@ -118,6 +121,7 @@ $tipoIco = ['Info' => 'ℹ️', 'Alerta' => '⚠️', 'Urgente' => '🚨', 'Exit
         <div class="tarjeta-titulo">➕ Nuevo aviso</div>
         <form method="POST">
             <input type="hidden" name="accion" value="crear">
+            <input type="hidden" name="csrf_token" value="<?= generarCsrfToken() ?>">
             <div class="grupo-formulario">
                 <label>Título</label>
                 <input type="text" name="titulo" required placeholder="Título del aviso" maxlength="150">

@@ -3,6 +3,7 @@
 
 /**
  * Registra una acción en la tabla auditoria.
+ * Usa Prepared Statements para evitar inyección SQL.
  */
 function registrarAuditoria(
     mysqli $conn,
@@ -11,14 +12,23 @@ function registrarAuditoria(
     ?int $registroId,
     string $detalle = ''
 ): void {
-    $userId = $_SESSION['usuario_id'] ?? 0;
-    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
-    $detalle = $conn->real_escape_string($detalle);
-    $tabla = $conn->real_escape_string($tabla);
-    $accion = $conn->real_escape_string($accion);
-    $ip = $conn->real_escape_string($ip);
-    $conn->query("
+    $userId = (int)($_SESSION['usuario_id'] ?? 0);
+    $ip     = $_SERVER['REMOTE_ADDR'] ?? '';
+
+    $stmt = $conn->prepare("
         INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, detalle, ip)
-        VALUES ($userId, '$accion', '$tabla', " . ($registroId ?? 'NULL') . ", '$detalle', '$ip')
+        VALUES (?, ?, ?, ?, ?, ?)
     ");
+    $stmt->bind_param('issiis', $userId, $accion, $tabla, $registroId, $detalle, $ip);
+    $stmt->execute();
+}
+
+/**
+ * Registra un intento de login (exitoso o fallido) en la auditoría.
+ */
+function registrarLogin(mysqli $conn, string $usuario, bool $exitoso): void
+{
+    $accion  = $exitoso ? 'LOGIN_OK' : 'LOGIN_FALLIDO';
+    $detalle = 'Usuario: ' . $usuario;
+    registrarAuditoria($conn, $accion, 'usuarios', null, $detalle);
 }

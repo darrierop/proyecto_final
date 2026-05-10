@@ -2,12 +2,16 @@
 require_once '../incluye/autenticacion.php';
 requiereRol(1);
 require_once '../incluye/bd.php';
+require_once '../incluye/auditoria.php';
 
 $msg = '';
 $err = '';
 
 // ── CREATE ──
 if ($_POST['action'] ?? '' === 'create') {
+  if (!validarCsrfToken($_POST['csrf_token'] ?? '')) {
+    $err = 'Petición no válida. Recarga la página.';
+  } else {
   $u  = trim($_POST['usuario']);
   $pw = $_POST['password'];
   $em = trim($_POST['email']);
@@ -29,6 +33,7 @@ if ($_POST['action'] ?? '' === 'create') {
     else
       $err = 'Error: ' . $conn->error;
   }
+  } // cierre validar CSRF
 }
 
 // ── DELETE ──
@@ -59,6 +64,7 @@ require_once '../incluye/cabecera.php';
   <div class="tarjeta-titulo">➕ Nuevo Usuario</div>
   <form method="POST">
     <input type="hidden" name="action" value="create">
+    <input type="hidden" name="csrf_token" value="<?= generarCsrfToken() ?>">
     <div class="form-row">
       <div class="form-group">
         <label>Nombre completo</label>

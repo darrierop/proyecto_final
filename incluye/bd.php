@@ -150,3 +150,17 @@ if ($conn->connect_error) {
 
 
 $conn->set_charset('utf8mb4');
+
+// ── Auto-migración: tabla de intentos de login (rate limiting) ──
+// Se crea sola si no existe; TablePlus la verá automáticamente.
+$conn->query("
+    CREATE TABLE IF NOT EXISTS intentos_login (
+        id       INT AUTO_INCREMENT PRIMARY KEY,
+        ip       VARCHAR(45)  NOT NULL,
+        usuario  VARCHAR(100) NOT NULL,
+        fecha    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_ip_fecha      (ip, fecha),
+        INDEX idx_usuario_fecha (usuario, fecha)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+");
+

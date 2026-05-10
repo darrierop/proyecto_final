@@ -5,6 +5,9 @@ $base = rtrim(str_replace("\\", "/", substr(
   strlen(str_replace("\\", "/", realpath($_SERVER["DOCUMENT_ROOT"])))
 )), "/");
 
+// Timeout de inactividad (30 min) — redirige al login si expira
+comprobarTimeout(30);
+
 // Enviar cabeceras de seguridad HTTP en todas las páginas autenticadas
 enviarCabecerasSeguridad();
 ?>

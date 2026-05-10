@@ -6,3 +6,32 @@
     Order allow,deny
     Deny from all
 </Files>
+
+# ── Bloquear acceso directo a archivos PHP sensibles ─────────
+<Files "test_db.php">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# ── Bloquear acceso directo al directorio incluye/ ───────────
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Impedir acceso directo a /incluye/*.php desde el navegador
+    RewriteCond %{REQUEST_URI} ^.*/incluye/
+    RewriteRule ^ - [F,L]
+</IfModule>
+
+# ── Cabecera X-Powered-By desactivada (via Apache) ──────────
+<IfModule mod_headers.c>
+    Header unset X-Powered-By
+    Header always unset X-Powered-By
+</IfModule>
+
+# ── Bloquear ejecución de PHP en uploads/ ────────────────────
+<IfModule mod_rewrite.c>
+    RewriteCond %{REQUEST_URI} ^.*/uploads/.*\.php$ [NC]
+    RewriteRule ^ - [F,L]
+</IfModule>
+
+# ── Opciones de directorio ────────────────────────────────────
+Options -Indexes

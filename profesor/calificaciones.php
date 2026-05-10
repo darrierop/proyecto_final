@@ -9,6 +9,9 @@ $cursoId = isset($_GET['curso_id']) ? (int)$_GET['curso_id'] : 0;
 
 // ── UPDATE nota_final ──
 if ($_POST['action'] ?? '' === 'nota') {
+    if (!validarCsrfToken($_POST['csrf_token'] ?? '')) {
+        $err = 'Petición no válida.';
+    } else {
     $matId = (int)$_POST['mat_id'];
     $nota  = $_POST['nota_final'] === '' ? 'NULL' : (float)str_replace(',','.',$_POST['nota_final']);
     // Verify this matricula belongs to the teacher's course
@@ -23,10 +26,14 @@ if ($_POST['action'] ?? '' === 'nota') {
     } else {
         $err = 'No tienes permiso para editar esta matrícula.';
     }
+    } // cierre CSRF
 }
 
 // ── ADD actividad ──
 if ($_POST['action'] ?? '' === 'add_cal') {
+    if (!validarCsrfToken($_POST['csrf_token'] ?? '')) {
+        $err = 'Petición no válida.';
+    } else {
     $matId   = (int)$_POST['mat_id'];
     $nombre  = trim($_POST['nombre_actividad']);
     $nota    = (float)$_POST['nota'];
@@ -36,6 +43,7 @@ if ($_POST['action'] ?? '' === 'add_cal') {
     $stmt->bind_param('isdds', $matId, $nombre, $nota, $peso, $fecha);
     if ($stmt->execute()) $msg = 'Calificación registrada.';
     else $err = $conn->error;
+    } // cierre CSRF
 }
 
 // ── My courses ──
@@ -105,6 +113,7 @@ function notaClass($n) {
           <td>
             <form method="POST" style="display:flex;gap:6px;align-items:center">
               <input type="hidden" name="action" value="nota">
+              <input type="hidden" name="csrf_token" value="<?= generarCsrfToken() ?>">
               <input type="hidden" name="mat_id" value="<?= $al['mat_id'] ?>">
               <input type="hidden" name="curso_id_redirect" value="<?= $cursoId ?>">
               <input type="number" name="nota_final" min="0" max="10" step="0.01"
@@ -148,6 +157,7 @@ function notaClass($n) {
             <!-- Add actividad form -->
             <form method="POST" style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end">
               <input type="hidden" name="action" value="add_cal">
+              <input type="hidden" name="csrf_token" value="<?= generarCsrfToken() ?>">
               <input type="hidden" name="mat_id" value="<?= $al['mat_id'] ?>">
               <input type="hidden" name="curso_id_redirect" value="<?= $cursoId ?>">
               <div>

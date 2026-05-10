@@ -17,6 +17,9 @@ $usuario = $conn->query("
 
 // ── Guardar información personal ──
 if ($_POST['accion'] ?? '' === 'info') {
+  if (!validarCsrfToken($_POST['csrf_token'] ?? '')) {
+    $err = 'Petición no válida.';
+  } else {
   $nombre = trim($_POST['nombre_completo']);
   $email = trim($_POST['email']);
   if ($nombre && $email) {
@@ -38,10 +41,14 @@ if ($_POST['accion'] ?? '' === 'info') {
   } else {
     $err = 'Nombre y email son obligatorios.';
   }
+  } // cierre CSRF
 }
 
 // ── Subir foto de perfil ──
 if ($_POST['accion'] ?? '' === 'foto') {
+  if (!validarCsrfToken($_POST['csrf_token'] ?? '')) {
+    $err = 'Petición no válida.';
+  } else {
   $seccion = 'info';
   if (isset($_FILES['foto_archivo']) && $_FILES['foto_archivo']['error'] === UPLOAD_ERR_OK) {
     $file = $_FILES['foto_archivo'];
@@ -73,11 +80,16 @@ if ($_POST['accion'] ?? '' === 'foto') {
   } else {
     $err = 'No se recibió ningún archivo.';
   }
+  } // cierre CSRF
 }
 
 
 // ── Cambiar contraseña ──
 if ($_POST['accion'] ?? '' === 'password') {
+  if (!validarCsrfToken($_POST['csrf_token'] ?? '')) {
+    $err = 'Petición no válida.';
+    $seccion = 'password';
+  } else {
   $actual = $_POST['password_actual'];
   $nueva  = $_POST['password_nueva'];
   $repetir = $_POST['password_repetir'];
@@ -100,6 +112,7 @@ if ($_POST['accion'] ?? '' === 'password') {
     $msg = 'Contraseña cambiada correctamente.';
   }
   $seccion = 'password';
+  } // cierre CSRF
 }
 
 // ── Estadísticas del usuario ──
@@ -158,6 +171,7 @@ require_once 'incluye/cabecera.php';
       <!-- Formulario subida de foto -->
       <form method="POST" enctype="multipart/form-data" style="margin-bottom:12px">
         <input type="hidden" name="accion" value="foto">
+        <input type="hidden" name="csrf_token" value="<?= generarCsrfToken() ?>">
         <label style="display:inline-block;padding:6px 14px;background:var(--bg);border:1px solid var(--borde);border-radius:8px;cursor:pointer;font-size:.75rem;color:var(--texto-2)">
           📷 Cambiar foto
           <input type="file" name="foto_archivo" accept="image/*" onchange="this.form.submit()" style="display:none">
@@ -270,6 +284,7 @@ require_once 'incluye/cabecera.php';
         <div class="tarjeta-titulo"><span>👤 Información personal</span></div>
         <form method="POST">
           <input type="hidden" name="accion" value="info">
+          <input type="hidden" name="csrf_token" value="<?= generarCsrfToken() ?>">
           <div class="fila-formulario">
             <div class="grupo-formulario">
               <label>Nombre completo</label>
@@ -305,6 +320,7 @@ require_once 'incluye/cabecera.php';
         <div class="tarjeta-titulo"><span>🔒 Cambiar contraseña</span></div>
         <form method="POST" style="max-width:440px">
           <input type="hidden" name="accion" value="password">
+          <input type="hidden" name="csrf_token" value="<?= generarCsrfToken() ?>">
           <div class="grupo-formulario">
             <label>Contraseña actual</label>
             <input type="password" name="password_actual" required placeholder="Tu contraseña actual">

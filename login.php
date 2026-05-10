@@ -1,5 +1,6 @@
 <?php
 require_once 'incluye/autenticacion.php';
+require_once 'incluye/auditoria.php';
 
 if (estaAutenticado()) {
     header('Location: ' . getBase() . '/panel.php');
@@ -8,7 +9,13 @@ if (estaAutenticado()) {
 
 require_once 'incluye/bd.php';
 
-$error = '';
+$error  = '';
+$aviso  = '';
+
+// Mensaje de sesión expirada por inactividad
+if (isset($_GET['timeout'])) {
+    $aviso = 'Tu sesión ha expirado por inactividad. Por favor, inicia sesión de nuevo.';
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validación CSRF
@@ -20,26 +27,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = $_POST['password'] ?? '';
 
         if ($usuario && $password) {
-            $stmt = $conn->prepare("
-                SELECT u.id, u.usuario, u.password, u.nombre_completo, u.rol_id, r.nombre AS rol_nombre
-                FROM usuarios u
-                JOIN roles r ON u.rol_id = r.id
-                WHERE u.usuario = ?
-            ");
-            $stmt->bind_param('s', $usuario);
-            $stmt->execute();
-            $res = $stmt->get_result();
+            // Comprobar bloqueo por brute-force antes de consultar la BD
+            if (estaBloqueado($usuario, $conn)) {
+                $error = 'Demasiados intentos fallidos. Espera 15 minutos e inténtalo de nuevo.';
+            } else {
+                $stmt = $conn->prepare("
+                    SELECT u.id, u.usuario, u.password, u.nombre_completo, u.rol_id, r.nombre AS rol_nombre
+                    FROM usuarios u
+                    JOIN roles r ON u.rol_id = r.id
+                    WHERE u.usuario = ?
+                ");
+                $stmt->bind_param('s', $usuario);
+                $stmt->execute();
+                $res = $stmt->get_result();
 
-            if ($fila = $res->fetch_assoc()) {
-                if (password_verify($password, $fila['password'])) {
-                    iniciarSesionSegura($fila);
-                    header('Location: ' . getBase() . '/panel.php');
-                    exit;
+                if ($fila = $res->fetch_assoc()) {
+                    if (password_verify($password, $fila['password'])) {
+                        limpiarIntentos($usuario, $conn);
+                        registrarLogin($conn, $usuario, true);
+                        iniciarSesionSegura($fila);
+                        header('Location: ' . getBase() . '/panel.php');
+                        exit;
+                    }
                 }
+                // Intento fallido: registrar y añadir delay mínimo
+                registrarIntentoFallido($usuario, $conn);
+                registrarLogin($conn, $usuario, false);
+                usleep(400000); // 400ms mínimo para dificultar enumeración
+                $error = 'Usuario o contraseña incorrectos.';
             }
-            // Delay anti-brute-force: 600ms en intento fallido
-            usleep(600000);
-            $error = 'Usuario o contraseña incorrectos.';
         } else {
             $error = 'Por favor completa todos los campos.';
         }
@@ -112,6 +128,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- FORMULARIO (visible cuando el toggle está activo) -->
     <div class="seccion-formulario" id="seccion-formulario">
+
+      <?php if ($aviso): ?>
+        <div class="alerta-error" role="alert" style="background:#fef3c7;border-color:#d97706;color:#92400e;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 5v4M8 11v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <?= htmlspecialchars($aviso) ?>
+        </div>
+      <?php endif; ?>
 
       <?php if ($error): ?>
         <div class="alerta-error" role="alert" id="alerta-login">

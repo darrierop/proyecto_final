@@ -10,6 +10,9 @@ $view = $_GET['view'] ?? 'inbox';
 
 // ── ENVIAR ──
 if ($_POST['action'] ?? '' === 'send') {
+  if (!validarCsrfToken($_POST['csrf_token'] ?? '')) {
+    $err = 'Petición no válida. Recarga la página.';
+  } else {
   $dest = (int) $_POST['destinatario_id'];
   $asunt = trim($_POST['asunto']);
   $cuerp = trim($_POST['cuerpo']);
@@ -24,6 +27,7 @@ if ($_POST['action'] ?? '' === 'send') {
   } else {
     $err = 'Selecciona un destinatario y escribe el mensaje.';
   }
+  } // cierre CSRF
 }
 
 // ── MARCAR LEÍDO ──
@@ -115,6 +119,7 @@ require_once 'incluye/cabecera.php';
 
         <form method="POST" class="compose-form">
           <input type="hidden" name="action" value="send">
+          <input type="hidden" name="csrf_token" value="<?= generarCsrfToken() ?>">
 
           <div class="compose-campo">
             <label class="compose-label">Para</label>
